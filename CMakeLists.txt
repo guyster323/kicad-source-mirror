@@ -1096,6 +1096,12 @@ include( CTest )
 enable_testing()
 list( APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure" )
 
+install( DIRECTORY ${CMAKE_SOURCE_DIR}/share/chatpcb_panel
+         DESTINATION ${KICAD_DATA} )
+
+file( COPY ${CMAKE_SOURCE_DIR}/share/chatpcb_panel
+      DESTINATION ${CMAKE_BINARY_DIR}/share )
+
 #================================================
 # Let CMake look in these directories for nested
 # 'CMakeLists.txt' files to process
@@ -1104,11 +1110,63 @@ list( APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure" )
 # Binaries ( CMake targets )
 add_subdirectory( api )
 add_subdirectory( resources )
+
+add_custom_target( chatpcb_build_runtime_assets
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/share/chatpcb_panel
+            ${CMAKE_BINARY_DIR}/share/chatpcb_panel
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/api/schemas
+            ${CMAKE_BINARY_DIR}/schemas
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_SOURCE_DIR}/api/schemas/api.v1.schema.json
+            ${CMAKE_BINARY_DIR}/api.v1.schema.json
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${CMAKE_BINARY_DIR}/share/kicad/schemas
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_SOURCE_DIR}/api/schemas/api.v1.schema.json
+            ${CMAKE_BINARY_DIR}/share/kicad/schemas/api.v1.schema.json
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${CMAKE_BINARY_DIR}/share/kicad/resources
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_BINARY_DIR}/resources/images.tar.gz
+            ${CMAKE_BINARY_DIR}/share/kicad/resources/images.tar.gz
+    DEPENDS bitmap_archive_build
+    COMMENT "Preparing ChatPCB development runtime assets"
+    )
+
 add_subdirectory( thirdparty )
 add_subdirectory( libs )
 add_subdirectory( common )
 add_subdirectory( 3d-viewer )
 add_subdirectory( eeschema )
+
+if( TARGET eeschema )
+    add_dependencies( eeschema chatpcb_build_runtime_assets )
+
+    if( WIN32 )
+        add_custom_target( chatpcb_eeschema_runtime_dlls
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                    $<TARGET_FILE_DIR:eeschema>
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    $<TARGET_FILE:kicommon>
+                    $<TARGET_FILE_DIR:eeschema>
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    $<TARGET_FILE:gal>
+                    $<TARGET_FILE_DIR:eeschema>
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    $<TARGET_FILE:kiapi>
+                    $<TARGET_FILE_DIR:eeschema>
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${CMAKE_BINARY_DIR}/common/nng.dll
+                    $<TARGET_FILE_DIR:eeschema>/nng.dll
+            DEPENDS kicommon gal kiapi
+            COMMENT "Preparing ChatPCB schematic editor runtime DLLs"
+            )
+        add_dependencies( eeschema chatpcb_eeschema_runtime_dlls )
+    endif()
+endif()
+
 add_subdirectory( gerbview )
 add_subdirectory( pcbnew )
 add_subdirectory( pagelayout_editor )

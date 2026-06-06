@@ -409,6 +409,7 @@ set( EESCHEMA_SRCS
     sch_collectors.cpp
     sch_commit.cpp
     sch_connection.cpp
+    ${CMAKE_SOURCE_DIR}/plugins/chatpcb_panel/chatpcb_panel.cpp
     sch_draw_panel.cpp
     sch_edit_frame.cpp
     sch_field.cpp
@@ -632,6 +633,7 @@ target_include_directories( eeschema_kiface_objects
     PUBLIC
         .
         netlist_exporters
+        ${CMAKE_SOURCE_DIR}/plugins/chatpcb_panel
      )
 
 target_link_libraries( eeschema_kiface_objects

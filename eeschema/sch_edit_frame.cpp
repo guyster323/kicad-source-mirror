@@ -34,6 +34,7 @@
 #include <dialogs/dialog_symbol_fields_table.h>
 #include <widgets/sch_design_block_pane.h>
 #include <widgets/panel_remote_symbol.h>
+#include <chatpcb_panel.h>
 #include <wx/srchctrl.h>
 #include <mail_type.h>
 #include <wx/clntdata.h>
@@ -232,6 +233,7 @@ SCH_EDIT_FRAME::SCH_EDIT_FRAME( KIWAY* aKiway, wxWindow* aParent ) :
     m_searchPane = new SCH_SEARCH_PANE( this );
     m_propertiesPanel = new SCH_PROPERTIES_PANEL( this, this );
     m_remoteSymbolPane = new PANEL_REMOTE_SYMBOL( this );
+    m_chatPcbPanel = new CHATPCB_PANEL( this );
 
     m_propertiesPanel->SetSplitterProportion( eeconfig()->m_AuiPanels.properties_splitter );
 
@@ -272,6 +274,16 @@ SCH_EDIT_FRAME::SCH_EDIT_FRAME( KIWAY* aKiway, wxWindow* aParent ) :
 
     m_auimgr.AddPane( m_designBlocksPane, defaultDesignBlocksPaneInfo( this ) );
     m_auimgr.AddPane( m_remoteSymbolPane, defaultRemoteSymbolPaneInfo( this ) );
+    m_auimgr.AddPane( m_chatPcbPanel, EDA_PANE().Palette().Name( ChatPcbPaneName() )
+                      .Caption( wxS( "ChatPCB" ) )
+                      .Right().Layer( 3 ).Position( 3 )
+                      .TopDockable( false )
+                      .BottomDockable( false )
+                      .CloseButton( true )
+                      .MinSize( FromDIP( wxSize( 280, 240 ) ) )
+                      .BestSize( FromDIP( wxSize( 360, 600 ) ) )
+                      .FloatingSize( FromDIP( wxSize( 420, 640 ) ) )
+                      .Show( true ) );
 
     m_auimgr.AddPane( createHighlightedNetNavigator(), defaultNetNavigatorPaneInfo() );
 

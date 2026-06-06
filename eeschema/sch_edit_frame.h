@@ -60,6 +60,7 @@ class SCHEMATIC;
 class SCH_COMMIT;
 class SCH_DESIGN_BLOCK_PANE;
 class PANEL_REMOTE_SYMBOL;
+class CHATPCB_PANEL;
 class DIALOG_BOOK_REPORTER;
 class DIALOG_ERC;
 class DIALOG_SYMBOL_FIELDS_TABLE;
@@ -911,6 +912,11 @@ public:
         return wxS( "NetNavigator" );
     }
 
+    static const wxString ChatPcbPaneName()
+    {
+        return wxS( "ChatPCB" );
+    }
+
     void RefreshNetNavigator( const NET_NAVIGATOR_ITEM_DATA* aSelection = nullptr );
 
     void MakeNetNavigatorNode( const wxString& aNetName, wxTreeItemId aParentId,
@@ -1108,6 +1114,7 @@ private:
     std::vector<LIB_ID>         m_designBlockHistoryList;
     SCH_DESIGN_BLOCK_PANE*      m_designBlocksPane;
     PANEL_REMOTE_SYMBOL*        m_remoteSymbolPane;
+    CHATPCB_PANEL*              m_chatPcbPanel;
 
     wxChoice*                   m_currentVariantCtrl;
 
